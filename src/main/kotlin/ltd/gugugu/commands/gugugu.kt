@@ -61,10 +61,4 @@ object gugugu {
         }
     }
 
-    @CommandBody(permission = "panling.admin.build")
-    val build = subCommand {
-        execute<Player> { sender, context, argument ->
-            Option.open(sender)
-        }
-    }
 }

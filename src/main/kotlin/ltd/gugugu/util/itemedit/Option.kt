@@ -35,8 +35,8 @@ object Option {
             }
             set('a', buildItem(Material.NAME_TAG) {
                 name = "§b修改名字"
-            }){
-                setname(player,item)
+            }) {
+                setname(player, item)
             }
             set('b', buildItem(XMaterial.FEATHER) {
                 name = "§8装备描述"
@@ -54,26 +54,49 @@ object Option {
             })
             set('d', buildItem(Material.PRISMARINE_SHARD) {
                 name = "§b设置自定义模型"
-            }){
-                setcustomModel(player,item)
+            }) {
+                setcustomModel(player, item)
             }
         }
     }
 
-    fun setname(player: Player, itemStack: ItemStack) {
+    private fun setname(player: Player, itemStack: ItemStack) {
         player.closeInventory()
         val uuid = player.uniqueId
         player.sendMessage("§a请输入要设置的名字")
         loreSetMarker[uuid] = Pair(1, itemStack)
     }
 
-    fun setid(player: Player, itemStack: ItemStack) {
+    private fun addLore(player: Player, itemStack: ItemStack) {
+        player.closeInventory()
+        val uuid = player.uniqueId
+        player.sendMessage("§a请输入要添加的装备描述")
+        loreSetMarker[uuid] = Pair(2, itemStack)
+    }
+
+    private fun removeLore(player: Player, itemStack: ItemStack) {
+        val meta = itemStack.itemMeta
+        if (meta != null && meta.hasLore() && meta.lore() != null && meta.lore()!!.isNotEmpty()) {
+            val currentLore = meta.lore()!!.toMutableList()
+            currentLore.removeAt(currentLore.size - 1)
+            meta.lore(currentLore)
+            itemStack.itemMeta = meta
+            player.inventory.setItemInMainHand(itemStack)
+            player.sendMessage("§a已删除最后一行装备描述")
+        } else {
+            player.sendMessage("§c该装备没有描述可以删除")
+        }
+        player.closeInventory()
+    }
+
+    private fun setid(player: Player, itemStack: ItemStack) {
         player.closeInventory()
         val uuid = player.uniqueId
         player.sendMessage("§a请输入要设置id")
         loreSetMarker[uuid] = Pair(3, itemStack)
     }
-    fun setcustomModel(player: Player, itemStack: ItemStack) {
+
+    private fun setcustomModel(player: Player, itemStack: ItemStack) {
         player.closeInventory()
         val uuid = player.uniqueId
         player.sendMessage("§a请输入要设置的自定义模型")
@@ -89,38 +112,58 @@ object Option {
             event.isCancelled = true
             val type = loreSetMarker[uuid]!!.first
             val item = loreSetMarker[uuid]!!.second
-            if (type == 1) {
-                val meta = item.itemMeta
-                meta.displayName(Component.text(chat))
-                item.itemMeta = meta
-                loreSetMarker.remove(uuid)
-                player.inventory.setItemInMainHand(item)
-                player.sendMessage("§a已成功设置装备名称为 $chat")
-                return
-            }
-            if (type == 3) {
-                item.getItemTag().set("id", chat)
-                player.inventory.setItemInMainHand(item)
-                player.sendMessage("§a已成功设置装备id为 {id:$chat}")
-            }
-
-            if (type == 4) {
-                try {
-                    chat.toInt()
-                } catch (e: NumberFormatException) {
-                    player.sendMessage("§c请输入一个数字")
+            when (type) {
+                1 -> {
+                    // 设置名字
+                    val meta = item.itemMeta
+                    meta.displayName(Component.text(chat))
+                    item.itemMeta = meta
                     loreSetMarker.remove(uuid)
-                    return
+                    player.inventory.setItemInMainHand(item)
+                    player.sendMessage("§a已成功设置装备名称为 $chat")
                 }
-                val meta = item.itemMeta
-                meta.setCustomModelData(chat.toInt())
-                item.itemMeta = meta
-                loreSetMarker.remove(uuid)
-                player.inventory.setItemInMainHand(item)
-                player.sendMessage("§a已成功设置装备CustomModelData")
-                return
+
+                2 -> {
+                    // 添加装备描述
+                    val meta = item.itemMeta
+                    val currentLore = if (meta.hasLore() && meta.lore() != null) {
+                        meta.lore()!!.toMutableList()
+                    } else {
+                        mutableListOf<Component>()
+                    }
+                    currentLore.add(Component.text(chat))
+                    meta.lore(currentLore)
+                    item.itemMeta = meta
+                    loreSetMarker.remove(uuid)
+                    player.inventory.setItemInMainHand(item)
+                    player.sendMessage("§a已成功添加装备描述: $chat")
+                }
+
+                3 -> {
+                    // 设置id
+                    item.getItemTag().set("id", chat)
+                    loreSetMarker.remove(uuid)
+                    player.inventory.setItemInMainHand(item)
+                    player.sendMessage("§a已成功设置装备id为 {id:$chat}")
+                }
+
+                4 -> {
+                    // 设置自定义模型
+                    try {
+                        val modelData = chat.toInt()
+                        val meta = item.itemMeta
+                        meta.setCustomModelData(modelData)
+                        item.itemMeta = meta
+                        loreSetMarker.remove(uuid)
+                        player.inventory.setItemInMainHand(item)
+                        player.sendMessage("§a已成功设置装备CustomModelData为 $modelData")
+                    } catch (e: NumberFormatException) {
+                        player.sendMessage("§c请输入一个有效的数字")
+                        loreSetMarker.remove(uuid)
+                    }
+                }
             }
         }
-    }
 
+    }
 }
