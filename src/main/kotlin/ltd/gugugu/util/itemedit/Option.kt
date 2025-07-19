@@ -44,14 +44,22 @@ object Option {
                 lore.add("§7右键点击删除一行装备描述")
             }) {
                 if (clickEvent().isLeftClick) {
-                    isCancelled = true
+                    addLore(player, item)
                 } else {
-                    isCancelled = true
+                    removeLore(player, item)
                 }
             }
             set('c', buildItem(Material.NAUTILUS_SHELL) {
-                name = "§b设置id"
-            })
+                name = "§b设置自定义nbt"
+                lore.add("§7左键点击添加自定义nbt")
+                lore.add("§7格式为 key.value")
+                lore.add("§7示例: §eid.panling:goldkey")
+                lore.add("§c注意，无法删除")
+            }) {
+                //setid(player, item)
+                isCancelled = true
+                player.sendMessage("§等待修复")
+            }
             set('d', buildItem(Material.PRISMARINE_SHARD) {
                 name = "§b设置自定义模型"
             }) {
@@ -92,7 +100,7 @@ object Option {
     private fun setid(player: Player, itemStack: ItemStack) {
         player.closeInventory()
         val uuid = player.uniqueId
-        player.sendMessage("§a请输入要设置id")
+        player.sendMessage("§a请输入要设置自定义nbt")
         loreSetMarker[uuid] = Pair(3, itemStack)
     }
 
@@ -140,11 +148,34 @@ object Option {
                 }
 
                 3 -> {
-                    // 设置id
-                    item.getItemTag().set("id", chat)
+                    // 设置自定义NBT
+                    if (chat.contains(".")) {
+                        val parts = chat.split(".", limit = 2)
+                        if (parts.size == 2) {
+                            val key = parts[0].trim()
+                            val value = parts[1].trim()
+
+                            if (key.isNotEmpty() && value.isNotEmpty()) {
+                                try {
+                                    item.getItemTag().set(key, value)
+                                    player.inventory.setItemInMainHand(item)
+                                    player.sendMessage("§a已成功设置NBT标签:")
+                                    player.sendMessage("§7键: §e$key")
+                                    player.sendMessage("§7值: §e$value")
+                                } catch (e: Exception) {
+                                    player.sendMessage("§c设置NBT时发生错误: ${e.message}")
+                                }
+                            } else {
+                                player.sendMessage("§c键和值都不能为空!")
+                            }
+                        } else {
+                            player.sendMessage("§c格式错误! 请使用 §ekey.value §c格式")
+                        }
+                    } else {
+                        player.sendMessage("§c格式错误! 请使用 §ekey.value §c格式")
+                        player.sendMessage("§7示例: §eplugin.customData")
+                    }
                     loreSetMarker.remove(uuid)
-                    player.inventory.setItemInMainHand(item)
-                    player.sendMessage("§a已成功设置装备id为 {id:$chat}")
                 }
 
                 4 -> {
