@@ -4,7 +4,7 @@ plugins {
     `java-library`
     `maven-publish`
     id("io.izzel.taboolib") version "2.0.23"
-    id("org.jetbrains.kotlin.jvm") version "1.9.22"
+    id("org.jetbrains.kotlin.jvm") version "1.9.23"
 }
 
 taboolib {
@@ -27,10 +27,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.purpurmc.purpur", "purpur-api", "1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.purpurmc.purpur", "purpur-api", "1.20.2-R0.1-SNAPSHOT")
     compileOnly("io.netty:netty-all:4.1.108.Final")
-    compileOnly("ink.ptms.core:v12103:12103:mapped")
-    compileOnly("ink.ptms.core:v12103:12103:universal")
+    compileOnly("ink.ptms.core:v12004:12004:mapped")
+    compileOnly("ink.ptms.core:v12004:12004:universal")
     compileOnly("com.mojang:authlib:3.11.50")
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
     compileOnly(kotlin("stdlib"))

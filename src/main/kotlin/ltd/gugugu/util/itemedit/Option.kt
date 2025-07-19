@@ -124,11 +124,25 @@ object Option {
                 1 -> {
                     // 设置名字
                     val meta = item.itemMeta
-                    meta.displayName(Component.text(chat))
+
+                    // 检查是否为翻译键格式（用双引号包围）
+                    val (isTranslation, processedText) = parseTranslationInput(chat)
+                    val nameComponent = if (isTranslation) {
+                        Component.translatable(processedText)
+                    } else {
+                        Component.text(chat)
+                    }
+
+                    meta.displayName(nameComponent)
                     item.itemMeta = meta
                     loreSetMarker.remove(uuid)
                     player.inventory.setItemInMainHand(item)
-                    player.sendMessage("§a已成功设置装备名称为 $chat")
+
+                    if (isTranslation) {
+                        player.sendMessage("§a已成功设置装备名称为翻译键: $processedText")
+                    } else {
+                        player.sendMessage("§a已成功设置装备名称为: $chat")
+                    }
                 }
 
                 2 -> {
@@ -139,12 +153,26 @@ object Option {
                     } else {
                         mutableListOf<Component>()
                     }
-                    currentLore.add(Component.text(chat))
+
+                    // 检查是否为翻译键格式（用双引号包围）
+                    val (isTranslation, processedText) = parseTranslationInput(chat)
+                    val loreComponent = if (isTranslation) {
+                        Component.translatable(processedText)
+                    } else {
+                        Component.text(chat)
+                    }
+
+                    currentLore.add(loreComponent)
                     meta.lore(currentLore)
                     item.itemMeta = meta
                     loreSetMarker.remove(uuid)
                     player.inventory.setItemInMainHand(item)
-                    player.sendMessage("§a已成功添加装备描述: $chat")
+
+                    if (isTranslation) {
+                        player.sendMessage("§a已成功添加装备描述翻译键: $processedText")
+                    } else {
+                        player.sendMessage("§a已成功添加装备描述: $chat")
+                    }
                 }
 
                 3 -> {
@@ -195,6 +223,14 @@ object Option {
                 }
             }
         }
+    }
 
+    private fun parseTranslationInput(input: String): Pair<Boolean, String> {
+        // 检查是否被双引号包围
+        if (input.startsWith("\"") && input.endsWith("\"") && input.length > 2) {
+            val translationKey = input.substring(1, input.length - 1)
+            return Pair(true, translationKey)
+        }
+        return Pair(false, input)
     }
 }

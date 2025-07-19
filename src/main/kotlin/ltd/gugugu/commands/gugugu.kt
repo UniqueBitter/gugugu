@@ -57,7 +57,6 @@ object gugugu {
                 sender.spigot().sendMessage(id)
                 sender.spigot().sendMessage(type)
             }
-
         }
     }
 
