@@ -3,7 +3,7 @@ package ltd.gugugu.ui
 import ltd.gugugu.data.Database
 import ltd.gugugu.data.platt
 import ltd.gugugu.util.ItemCache
-import ltd.gugugu.util.ItemEdit
+import ltd.gugugu.util.ItemGet
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -56,7 +56,7 @@ object Chest {
                     name = "§a点我购买"
                     lore.add("§7需要64通宝")
                 }) {
-                    if (ItemEdit.takeItem(player, "panling:vantone_tick", 64)) {
+                    if (ItemGet.takeItem(player, "panling:vantone_tick", 64)) {
                         player.sendMessage("§a解锁成功！")
                         data.set(platt.chestb, PersistentDataType.BOOLEAN, true)
                         chestMenu(player)
@@ -77,7 +77,7 @@ object Chest {
                     name = "§a点我购买"
                     lore.add("§7需要128通宝")
                 }) {
-                    if (ItemEdit.takeItem(player, "panling:vantone_tick", 128)) {
+                    if (ItemGet.takeItem(player, "panling:vantone_tick", 128)) {
                         player.sendMessage("§a解锁成功！")
                         data.set(platt.chestc, PersistentDataType.BOOLEAN, true)
                         chestMenu(player)

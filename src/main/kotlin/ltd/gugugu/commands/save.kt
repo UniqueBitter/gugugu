@@ -11,7 +11,7 @@ import taboolib.common.platform.command.mainCommand
 
 @CommandHeader("save", permission = "panling.admin")
 object save {
-    @CommandBody(permission = "panling.admin.fly")
+    @CommandBody(permission = "panling.admin.save")
     val save = mainCommand {
         execute<Player> { sender, context, argument ->
             Chest.playerChest.forEach {

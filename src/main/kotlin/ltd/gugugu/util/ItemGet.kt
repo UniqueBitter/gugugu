@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.module.nms.getItemTag
 
-object ItemEdit {
+object ItemGet {
 
     /**
      * 检测物品是否具有指定的ID

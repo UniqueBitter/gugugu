@@ -1,7 +1,7 @@
 package ltd.gugugu.commands
 
-import ltd.gugugu.util.ItemEdit
-import net.kyori.adventure.text.Component
+import ltd.gugugu.util.ItemGet
+import ltd.gugugu.util.itemedit.Option
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
@@ -26,7 +26,7 @@ object gugugu {
         execute<Player> { sender, context, argument ->
             val player = sender
             val item = player.inventory.itemInMainHand
-            if (ItemEdit.checkItem(item,"panling:goldkey")){
+            if (ItemGet.checkItem(item,"panling:goldkey")){
                 player.sendMessage("§a检测到金钥匙啦！")
             }else{
                 player.sendMessage("§c未检测到")
@@ -41,18 +41,30 @@ object gugugu {
             val item = player.inventory.itemInMainHand
             item.itemTagReader {
                 val itemId = getString("id", "")
-                val id = TextComponent("§a当前物品：${item.displayName} (点我复制当前物品id)").apply {
+                val name = TextComponent("§a当前name：${item.displayName} (点我复制当前物品name)").apply {
+                    hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, Text("§e点击复制"))
+                    clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, item.displayName)
+                }
+                val id = TextComponent("§a当前id：$itemId (点我复制当前物品id)").apply {
                     hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, Text("§e点击复制"))
                     clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, itemId)
                 }
-                val type = TextComponent("§a当前物品：${item.displayName} (点我复制当前物品type)").apply {
+                val type = TextComponent("§a当前type：$${item.type} (点我复制当前物品type)").apply {
                     hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, Text("§e点击复制"))
                     clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "${item.type}")
                 }
+                sender.spigot().sendMessage(name)
                 sender.spigot().sendMessage(id)
                 sender.spigot().sendMessage(type)
             }
 
+        }
+    }
+
+    @CommandBody(permission = "panling.admin.build")
+    val build = subCommand {
+        execute<Player> { sender, context, argument ->
+            Option.open(sender)
         }
     }
 }

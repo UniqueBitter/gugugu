@@ -26,19 +26,25 @@ object MainUi {
                 lore.add("§f点我打开")
                 lore.add("§f万通宝符存取界面")
                 hideAll()
-            })
+            }){
+                Wantong.openMenu(player)
+            }
             set('B', buildItem(XMaterial.IRON_INGOT){
                 name = "§b钱币"
                 lore.add("§f点我打开")
                 lore.add("§f钱币存取界面")
                 hideAll()
-            })
+            }){
+                Yinpiao.openMenu(player)
+            }
             set('C', buildItem(XMaterial.EMERALD){
                 name = "§b元素"
                 lore.add("§f点我打开")
                 lore.add("§f元素存取界面")
                 hideAll()
-            })
+            }){
+                Yuansu.openMenu(player)
+            }
             set('D', buildItem(XMaterial.CHEST){
                 name = "§e§l清点库存"
                 lore.add("§f点我查看")

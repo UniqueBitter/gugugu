@@ -33,7 +33,6 @@ object Main : Plugin() {
             value.forEach {
                 StoreAPI.save(uuid, it.key, it.value)
             }
-
         }
     }
 

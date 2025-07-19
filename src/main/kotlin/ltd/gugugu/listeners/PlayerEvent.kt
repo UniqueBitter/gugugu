@@ -1,29 +1,23 @@
 package ltd.gugugu.listeners
 
 
+import ltd.gugugu.data.StoreAPI
 import ltd.gugugu.ui.Chest
 import ltd.gugugu.ui.qiankun.MainUi
-import ltd.gugugu.util.ItemEdit.checkItem
+import ltd.gugugu.util.ItemGet.checkItem
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.module.nms.getItemTag
+import taboolib.common.platform.function.submitAsync
 import taboolib.module.nms.itemTagReader
-import taboolib.module.ui.Menu
-import taboolib.platform.util.buildItem
-import taboolib.platform.util.hasName
 import taboolib.platform.util.isRightClick
-import taboolib.platform.util.title
 import java.util.*
-import javax.swing.text.View
 import kotlin.collections.HashSet
 
 object PlayerEvent {
@@ -37,7 +31,9 @@ object PlayerEvent {
             )
         )
     }
+
     private val farmList = HashMap<UUID, Int>()
+
     //耕地保护
     @SubscribeEvent
     fun farmProtect(event: PlayerInteractEvent) {
@@ -62,6 +58,7 @@ object PlayerEvent {
     }
 
     val air = Material.AIR
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun clickUi(event: InventoryClickEvent) {
         if (event.view.title in noClick || event.view.title.endsWith('§')) {
@@ -79,7 +76,7 @@ object PlayerEvent {
     @SubscribeEvent
     fun menu(event: PlayerInteractEvent) {
         val player = event.player
-        val item = event.item ?:return
+        val item = event.item ?: return
         item.itemTagReader {
             val itemId = getString("id", "")
             if ((itemId == "panling:cangku_box" || itemId == "panling:canku_box") && event.isRightClick()) {
@@ -92,6 +89,7 @@ object PlayerEvent {
             }
         }
     }
+
     val noitemlist = listOf(
         "panling:cangku_box",
         "panling:canku_box",
@@ -103,15 +101,16 @@ object PlayerEvent {
         "§b日月袋",
         "§b乾坤袋",
     )
+
     @SubscribeEvent
-    fun itemProtect(event: InventoryClickEvent){
+    fun itemProtect(event: InventoryClickEvent) {
         val player = event.whoClicked as Player
 
         if (event.view.title !in noinvList) {
             return
         }
         val inv = player.inventory
-        val item = event.currentItem?:return
+        val item = event.currentItem ?: return
 
         if (item.type == Material.AIR) {
             return
@@ -135,7 +134,7 @@ object PlayerEvent {
             return
         }
         val itemsToRemove = mutableListOf<Int>()
-        for (i in 0 until inventory.size-1) {
+        for (i in 0 until inventory.size - 1) {
             val item = inventory.getItem(i) ?: continue
             if (item.type == Material.AIR) {
                 continue
@@ -154,6 +153,16 @@ object PlayerEvent {
                 player.world.dropItemNaturally(player.location, item)
             }
             player.sendMessage("§c检测到不允许的物品，已自动弹出！")
+        }
+        submitAsync {
+            Chest.playerChest.forEach {
+                val value = it.value
+                val uuid = it.key
+                value.forEach {
+                    StoreAPI.save(uuid, it.key, it.value)
+                }
+            }
+
         }
     }
 }
